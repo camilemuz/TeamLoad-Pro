@@ -71,9 +71,10 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: const ColorScheme.dark(
               primary: AppTheme.primary,
               onPrimary: Colors.white,
+              surface: AppTheme.surface,
               onSurface: AppTheme.textPrimary,
             ),
           ),
@@ -116,7 +117,6 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
 
     if (!mounted) return;
 
-    // Mostrar overlay de éxito
     setState(() {
       _isSubmitting = false;
       _showSuccessOverlay = true;
@@ -125,7 +125,6 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
 
     _animController.forward(from: 0.0);
 
-    // Cuenta regresiva
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(const Duration(milliseconds: 900), (t) {
       if (!mounted) return;
@@ -136,7 +135,6 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
       });
     });
 
-    // Auto-restablecimiento para el siguiente jugador en 1.8 segundos
     _resetTimer?.cancel();
     _resetTimer = Timer(const Duration(milliseconds: 1800), () {
       _resetForNextPlayer();
@@ -159,7 +157,7 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
     final categories = settings.categories;
     final intensities = settings.intensities.isNotEmpty
         ? settings.intensities
-        : ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte'];
+        : ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'];
 
     final dateFormatted = DateFormat("EEEE, d 'de' MMMM", 'es').format(_selectedDate);
 
@@ -169,50 +167,73 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
           backgroundColor: AppTheme.background,
           appBar: AppBar(
             backgroundColor: AppTheme.surface,
-            elevation: 1,
-            shadowColor: Colors.black.withValues(alpha: 0.1),
-            titleSpacing: 16,
-            toolbarHeight: 68,
+            elevation: 3,
+            shadowColor: Colors.black87,
+            titleSpacing: 12,
+            toolbarHeight: 70,
             title: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/images/logo_mc.png',
-                    height: 44,
-                    width: 44,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 44,
-                      width: 44,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.sports_soccer,
-                        color: AppTheme.primary,
-                        size: 26,
+                // LOGO 1: TeamLoad Pro
+                Container(
+                  height: 40,
+                  width: 40,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/app_logo_transparent.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        'assets/images/app_logo.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) => const Icon(Icons.fitness_center, color: AppTheme.primary),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+                // LOGO 2: Club Deportivo MC Emprender
+                Container(
+                  height: 40,
+                  width: 40,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppTheme.secondary.withValues(alpha: 0.4)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/logo_mc.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.sports_soccer, color: AppTheme.secondary),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // TÍTULO DE LA APP Y CLUB
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'MC EMPRENDER',
+                      'TeamLoad Pro',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
+                        letterSpacing: 0.3,
                         color: AppTheme.textPrimary,
                       ),
                     ),
                     Text(
-                      'Votación de Jugadores ⚽',
+                      'MC EMPRENDER ⚽',
                       style: TextStyle(
                         fontSize: 11,
                         color: AppTheme.secondary,
@@ -224,82 +245,178 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
               ],
             ),
             actions: [
-              // Botón destacado de acceso a Súper Usuario / DT
-              FilledButton.icon(
-                onPressed: widget.onOpenSuperUser,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // BOTÓN SÚPER USUARIO PROMINENTE EN APPBAR
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: FilledButton.icon(
+                  onPressed: widget.onOpenSuperUser,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                    ),
+                  ),
+                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 18, color: Colors.white),
+                  label: const Text(
+                    'Súper Usuario',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 0.2),
                   ),
                 ),
-                icon: const Icon(Icons.shield_rounded, size: 18, color: Colors.white),
-                label: const Text(
-                  'Súper Usuario',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                ),
               ),
-              const SizedBox(width: 16),
             ],
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 680),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 720),
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Encabezado Principal y Selector de Fecha
+                      // HERO BANNER PRINCIPAL CON AMBOS LOGOS Y NOMBRE OFICIAL
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppTheme.divider),
+                          gradient: LinearGradient(
+                            colors: [
+                              AppTheme.surface,
+                              AppTheme.surfaceVariant.withValues(alpha: 0.8),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4), width: 1.5),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 10,
+                              color: AppTheme.primary.withValues(alpha: 0.15),
+                              blurRadius: 20,
                               offset: const Offset(0, 4),
                             ),
                           ],
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.calendar_today_rounded, size: 18, color: AppTheme.primary),
-                            const SizedBox(width: 10),
+                            // DUAL BADGE: TeamLoad Pro + MC Emprender
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 52,
+                                  width: 52,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(
+                                      'assets/images/app_logo_transparent.png',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (c, e, s) => Image.asset(
+                                        'assets/images/app_logo.png',
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (c2, e2, s2) => const Icon(Icons.bolt, color: AppTheme.primary),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  height: 52,
+                                  width: 52,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppTheme.secondary.withValues(alpha: 0.5)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(
+                                      'assets/images/logo_mc.png',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (c, e, s) => const Icon(Icons.sports_soccer, color: AppTheme.secondary),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 14),
+                            // INFO BANNER
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primary.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5)),
+                                        ),
+                                        child: const Text(
+                                          'TEAMLOAD PRO',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppTheme.primary,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Text(
+                                        'MC EMPRENDER',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppTheme.secondary,
+                                          letterSpacing: 0.6,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
                                   const Text(
-                                    'ENTRENAMIENTO DEL DÍA',
+                                    'REGISTRO DE ESFUERZO (RPE)',
                                     style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.textSecondary,
-                                      letterSpacing: 0.5,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppTheme.textPrimary,
+                                      letterSpacing: 0.2,
                                     ),
                                   ),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    dateFormatted,
+                                    dateFormatted.toUpperCase(),
                                     style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme.textPrimary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.textSecondary,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.edit_calendar_rounded, size: 20, color: AppTheme.textSecondary),
-                              tooltip: 'Cambiar fecha',
+                            IconButton.filledTonal(
+                              icon: const Icon(Icons.calendar_month_rounded, size: 20, color: AppTheme.primary),
+                              tooltip: 'Cambiar fecha del entrenamiento',
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppTheme.surfaceVariant,
+                              ),
                               onPressed: _pickDate,
                             ),
                           ],
@@ -315,15 +432,15 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                             backgroundColor: AppTheme.primary,
                             child: Text(
                               '1',
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900),
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 10),
                           Text(
                             'ELIGE TU CATEGORÍA',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
                             ),
@@ -332,21 +449,24 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                       ),
                       const SizedBox(height: 10),
                       if (categories.isEmpty)
-                        const Center(child: Text('Cargando categorías...'))
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Text('Cargando categorías...'),
+                        ))
                       else
                         Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: categories.map((cat) {
                             final isSelected = _selectedCategory == cat;
                             return ChoiceChip(
                               label: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 child: Text(
                                   cat,
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                    fontSize: 13,
+                                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                                     color: isSelected ? Colors.white : AppTheme.textPrimary,
                                   ),
                                 ),
@@ -363,14 +483,14 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
                                   color: isSelected ? AppTheme.primary : AppTheme.divider,
-                                  width: isSelected ? 2 : 1,
+                                  width: isSelected ? 2 : 1.2,
                                 ),
                               ),
                               showCheckmark: false,
                             );
                           }).toList(),
                         ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 22),
 
                       // PASO 2: ¿CÓMO SENTISTE EL ENTRENAMIENTO?
                       const Row(
@@ -380,92 +500,125 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                             backgroundColor: AppTheme.secondary,
                             child: Text(
                               '2',
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900),
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 10),
                           Text(
                             '¿CÓMO SENTISTE EL ENTRENAMIENTO HOY?',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       const Text(
                         'Toca directamente la tarjeta que mejor describa tu esfuerzo:',
                         style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                       ),
                       const SizedBox(height: 12),
 
-                      // 4 TARJETAS TÁCTILES GIGANTES DE INTENSIDAD
-                      ...intensities.map((intensity) {
+                      // TARJETAS TÁCTILES DE INTENSIDAD (DINÁMICAS)
+                      ...intensities.asMap().entries.map((entry) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildIntensityCard(intensity),
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _buildIntensityCard(entry.value, entry.key, intensities.length),
                         );
                       }),
                       const SizedBox(height: 16),
 
-                      // BANNER INFERIOR DE ACCESO A ENTRENADOR
+                      // BANNER INFERIOR DESTACADO DE ACCESO A ENTRENADOR / SÚPER USUARIO
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceVariant,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppTheme.divider),
+                          gradient: LinearGradient(
+                            colors: [
+                              AppTheme.surface,
+                              AppTheme.surfaceVariant,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4), width: 1.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primary.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.shield_outlined, color: AppTheme.primary, size: 22),
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '¿Eres el Entrenador o Analista?',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme.textPrimary,
-                                    ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primary.withValues(alpha: 0.2),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5)),
                                   ),
-                                  Text(
-                                    'Ingresa con PIN para ver ACWR y estadísticas',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: AppTheme.textSecondary,
-                                    ),
+                                  child: const Icon(Icons.admin_panel_settings_rounded, color: AppTheme.primary, size: 24),
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '¿Eres el Entrenador / DT / Analista?',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        'Ver estadísticas en vivo, ratios ACWR y configuración',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            FilledButton.tonal(
+                            const SizedBox(height: 12),
+                            FilledButton.icon(
                               onPressed: widget.onOpenSuperUser,
                               style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                backgroundColor: AppTheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
                               ),
-                              child: const Text(
-                                'Entrar (PIN)',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                              icon: const Icon(Icons.vpn_key_rounded, size: 18),
+                              label: const Text(
+                                'Ingresar como Súper Usuario (PIN)',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -480,7 +633,7 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
             child: GestureDetector(
               onTap: _resetForNextPlayer,
               child: Container(
-                color: Colors.black.withValues(alpha: 0.75),
+                color: Colors.black.withValues(alpha: 0.85),
                 padding: const EdgeInsets.all(24),
                 child: Center(
                   child: ScaleTransition(
@@ -491,10 +644,11 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                       decoration: BoxDecoration(
                         color: AppTheme.surface,
                         borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: AppTheme.secondary.withValues(alpha: 0.5), width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 30,
+                            color: AppTheme.secondary.withValues(alpha: 0.3),
+                            blurRadius: 35,
                             offset: const Offset(0, 10),
                           ),
                         ],
@@ -505,13 +659,13 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                           Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppTheme.secondary.withValues(alpha: 0.15),
+                              color: AppTheme.secondary.withValues(alpha: 0.18),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
                               Icons.check_circle_rounded,
                               color: AppTheme.secondary,
-                              size: 64,
+                              size: 68,
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -522,7 +676,7 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                               color: AppTheme.textPrimary,
-                              letterSpacing: -0.5,
+                              letterSpacing: -0.3,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -530,14 +684,14 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                             '$_selectedCategory • ${_selectedIntensity ?? ""}',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
                               color: AppTheme.primary,
                             ),
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            '¡Buen trabajo en el entrenamiento! ⚽',
+                            '¡Excelente esfuerzo en el entrenamiento! ⚽',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
@@ -559,8 +713,8 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.primary,
+                                    strokeWidth: 2.2,
+                                    color: AppTheme.secondary,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -587,52 +741,25 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
     );
   }
 
-  Widget _buildIntensityCard(String intensity) {
-    final color = AppTheme.getIntensityColor(intensity);
+  Widget _buildIntensityCard(String intensity, [int? index, int? total]) {
+    final color = AppTheme.getIntensityColor(intensity, index, total);
     final isSelected = _selectedIntensity == intensity;
-
-    IconData icon;
-    String scoreText;
-    String description;
-
-    switch (intensity.toLowerCase()) {
-      case 'ligero':
-        icon = Icons.sentiment_satisfied_alt_rounded;
-        scoreText = '25 u.a.';
-        description = 'Suave • Calentamiento o recuperación';
-        break;
-      case 'normal':
-        icon = Icons.fitness_center_rounded;
-        scoreText = '50 u.a.';
-        description = 'Buen ritmo • Carga adecuada y controlada';
-        break;
-      case 'fuerte':
-        icon = Icons.local_fire_department_rounded;
-        scoreText = '75 u.a.';
-        description = 'Intenso • Gran exigencia física y mental';
-        break;
-      case 'muy fuerte':
-        icon = Icons.bolt_rounded;
-        scoreText = '100 u.a.';
-        description = 'Al límite • Agotamiento máximo';
-        break;
-      default:
-        icon = Icons.sports_score_rounded;
-        scoreText = '50 u.a.';
-        description = 'Nivel personalizado';
-    }
+    final icon = AppTheme.getIntensityIcon(intensity);
+    final score = AppTheme.getIntensityScore(intensity, index, total);
+    final scoreText = '$score u.a.';
+    final description = AppTheme.getIntensityDescription(intensity);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: _isSubmitting ? null : () => _submitVote(intensity),
         borderRadius: BorderRadius.circular(18),
-        splashColor: color.withValues(alpha: 0.2),
-        highlightColor: color.withValues(alpha: 0.1),
+        splashColor: color.withValues(alpha: 0.25),
+        highlightColor: color.withValues(alpha: 0.15),
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? color.withValues(alpha: 0.12) : AppTheme.surface,
+            color: isSelected ? color.withValues(alpha: 0.18) : AppTheme.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isSelected ? color : AppTheme.divider,
@@ -640,8 +767,8 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
             ),
             boxShadow: [
               BoxShadow(
-                color: isSelected ? color.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.02),
-                blurRadius: isSelected ? 12 : 6,
+                color: isSelected ? color.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.15),
+                blurRadius: isSelected ? 14 : 6,
                 offset: const Offset(0, 3),
               ),
             ],
@@ -651,8 +778,9 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
+                  color: color.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
+                  border: Border.all(color: color.withValues(alpha: 0.4)),
                 ),
                 child: Icon(icon, color: color, size: 28),
               ),
@@ -676,8 +804,9 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.15),
+                            color: color.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: color.withValues(alpha: 0.4)),
                           ),
                           child: Text(
                             scoreText,
@@ -707,8 +836,8 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
                 height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: color.withValues(alpha: 0.1),
-                  border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+                  color: color.withValues(alpha: 0.15),
+                  border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
                 ),
                 child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: color),
               ),
@@ -719,3 +848,4 @@ class _VotingKioskScreenState extends State<VotingKioskScreen> with SingleTicker
     );
   }
 }
+

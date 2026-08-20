@@ -116,25 +116,31 @@ class DashboardScreen extends StatelessWidget {
                     // Tarjetas de Métricas de Rendimiento
                     Row(
                       children: [
-                        MetricCard(
-                          title: 'Votaciones',
-                          value: totalVotes.toString(),
-                          subtitle: _getPeriodSubtitle(trainingProvider.selectedDateFilter),
-                          statusColor: AppTheme.primary,
+                        Expanded(
+                          child: MetricCard(
+                            title: 'Votaciones',
+                            value: totalVotes.toString(),
+                            subtitle: _getPeriodSubtitle(trainingProvider.selectedDateFilter),
+                            statusColor: AppTheme.primary,
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        MetricCard(
-                          title: 'Carga Promedio',
-                          value: '${avgIntensity.toStringAsFixed(0)} u.a.',
-                          subtitle: _getIntensityLabel(avgIntensity),
-                          statusColor: _getIntensityColor(avgIntensity),
+                        Expanded(
+                          child: MetricCard(
+                            title: 'Carga Promedio',
+                            value: '${avgIntensity.toStringAsFixed(0)} u.a.',
+                            subtitle: _getIntensityLabel(avgIntensity),
+                            statusColor: _getIntensityColor(avgIntensity),
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        MetricCard(
-                          title: 'Ratio ACWR',
-                          value: acwr.toStringAsFixed(2),
-                          subtitle: acwrStatus,
-                          statusColor: acwrColor,
+                        Expanded(
+                          child: MetricCard(
+                            title: 'Ratio ACWR',
+                            value: acwr.toStringAsFixed(2),
+                            subtitle: acwrStatus,
+                            statusColor: acwrColor,
+                          ),
                         ),
                       ],
                     ),
@@ -194,13 +200,21 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              _buildDistributionItem('Ligero', distribution['Ligero'] ?? 0, totalVotes, AppTheme.intensityLigero),
-                              _buildDistributionItem('Normal', distribution['Normal'] ?? 0, totalVotes, AppTheme.intensityNormal),
-                              _buildDistributionItem('Fuerte', distribution['Fuerte'] ?? 0, totalVotes, AppTheme.intensityFuerte),
-                              _buildDistributionItem('Muy fuerte', distribution['Muy fuerte'] ?? 0, totalVotes, AppTheme.intensityMuyFuerte),
-                            ],
+                          Builder(
+                            builder: (context) {
+                              final activeIntensities = settingsProvider.intensities.isNotEmpty
+                                  ? settingsProvider.intensities
+                                  : ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'];
+                              return Row(
+                                children: activeIntensities.asMap().entries.map((entry) {
+                                  final idx = entry.key;
+                                  final name = entry.value;
+                                  final color = AppTheme.getIntensityColor(name, idx, activeIntensities.length);
+                                  final count = distribution[name] ?? 0;
+                                  return _buildDistributionItem(name, count, totalVotes, color);
+                                }).toList(),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -431,16 +445,18 @@ class DashboardScreen extends StatelessWidget {
 
   String _getIntensityLabel(double score) {
     if (score == 0) return 'Sin datos';
-    if (score <= 35) return 'Ligera';
-    if (score <= 60) return 'Moderada';
-    if (score <= 85) return 'Fuerte';
-    return 'Muy Fuerte';
+    if (score <= 30) return 'Muy Ligera';
+    if (score <= 50) return 'Ligera';
+    if (score <= 70) return 'Normal';
+    if (score <= 90) return 'Intensa';
+    return 'Muy Intensa';
   }
 
   Color _getIntensityColor(double score) {
-    if (score <= 35) return AppTheme.intensityLigero;
-    if (score <= 60) return AppTheme.intensityNormal;
-    if (score <= 85) return AppTheme.intensityFuerte;
-    return AppTheme.intensityMuyFuerte;
+    if (score <= 30) return AppTheme.intensityMuyLigero;
+    if (score <= 50) return AppTheme.intensityLigero;
+    if (score <= 70) return AppTheme.intensityNormal;
+    if (score <= 90) return AppTheme.intensityIntenso;
+    return AppTheme.intensityMuyIntenso;
   }
 }

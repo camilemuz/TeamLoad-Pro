@@ -12,14 +12,14 @@ class AppSettingsModel extends AppSettings {
     if (!doc.exists || doc.data() == null) {
       return const AppSettingsModel(
         categories: ['Sub 15', 'Sub 17', 'Sub 19', 'Primer plantel'],
-        intensities: ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte'],
+        intensities: ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'],
         superUserPin: '1234',
       );
     }
     final data = doc.data() as Map<String, dynamic>;
     return AppSettingsModel(
       categories: List<String>.from(data['categories'] ?? ['Sub 15', 'Sub 17', 'Sub 19', 'Primer plantel']),
-      intensities: List<String>.from(data['intensities'] ?? ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte']),
+      intensities: List<String>.from(data['intensities'] ?? ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso']),
       superUserPin: data['superUserPin'] ?? '1234',
     );
   }

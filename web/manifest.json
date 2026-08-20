@@ -1,11 +1,11 @@
 {
-    "name": "TeamLoad Pro",
-    "short_name": "TeamLoad Pro",
+    "name": "MC Emprender - Control de Cargas",
+    "short_name": "MC Emprender",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0b111e",
+    "theme_color": "#0b111e",
+    "description": "Sistema de control de cargas de entrenamiento, RPE y rendimiento deportivo MC Emprender.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

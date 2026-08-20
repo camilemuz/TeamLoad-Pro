@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/training_load.dart';
 import '../../domain/repositories/training_load_repository.dart';
 
@@ -89,18 +90,7 @@ class TrainingLoadProvider extends ChangeNotifier {
   }
 
   int getIntensityScore(String intensity) {
-    switch (intensity.toLowerCase()) {
-      case 'ligero':
-        return 25;
-      case 'normal':
-        return 50;
-      case 'fuerte':
-        return 75;
-      case 'muy fuerte':
-        return 100;
-      default:
-        return 50;
-    }
+    return AppTheme.getIntensityScore(intensity);
   }
 
   // Filtrado de votos según categoría y periodo temporal seleccionado (Día, Semana, Mes, Todo)
@@ -137,17 +127,14 @@ class TrainingLoadProvider extends ChangeNotifier {
     return sum / filteredLoads.length.toDouble();
   }
 
-  // Distribución de votos por nivel de intensidad
+  // Distribución de votos por nivel de intensidad (dinámico según votos y configuraciones)
   Map<String, int> get intensityDistribution {
-    final map = <String, int>{
-      'Ligero': 0,
-      'Normal': 0,
-      'Fuerte': 0,
-      'Muy fuerte': 0,
-    };
+    final map = <String, int>{};
     for (final load in filteredLoads) {
-      final key = load.intensity;
-      map[key] = (map[key] ?? 0) + 1;
+      final key = load.intensity.trim();
+      if (key.isNotEmpty) {
+        map[key] = (map[key] ?? 0) + 1;
+      }
     }
     return map;
   }

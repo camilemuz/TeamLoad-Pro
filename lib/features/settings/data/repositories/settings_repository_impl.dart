@@ -21,7 +21,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
       if (!doc.exists) {
         final defaultSettings = const AppSettingsModel(
           categories: ['Sub 15', 'Sub 17', 'Sub 19', 'Primer plantel'],
-          intensities: ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte'],
+          intensities: ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'],
           superUserPin: '1234',
         );
         await _docRef.set(defaultSettings.toFirestore());
@@ -31,7 +31,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } catch (e) {
       return const AppSettings(
         categories: ['Sub 15', 'Sub 17', 'Sub 19', 'Primer plantel'],
-        intensities: ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte'],
+        intensities: ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'],
         superUserPin: '1234',
       );
     }

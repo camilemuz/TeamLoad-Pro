@@ -187,10 +187,11 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
                       content:
                           'En la ciencia del deporte y clubes profesionales, la carga de entrenamiento no se mide en kilogramos ni en kilómetros, sino en **u.a. (Unidades Arbitrarias)**.\n\n'
                           'Representa la magnitud del esfuerzo percibido por los jugadores:\n'
-                          '• 🟢 **Ligero = 25 u.a.** (Sesión suave / regenerativa)\n'
-                          '• 🔵 **Normal = 50 u.a.** (Sesión óptima / ritmo estándar)\n'
-                          '• 🟠 **Fuerte = 75 u.a.** (Alta exigencia física / competitiva)\n'
-                          '• 🔴 **Muy Fuerte = 100 u.a.** (Fatiga extrema / al límite)',
+                          '• 🟢 **Muy Ligero = 20 u.a.** (Activación / regenerativo suave)\n'
+                          '• 🟢 **Ligero = 40 u.a.** (Sesión suave / calentamiento o descarga)\n'
+                          '• 🔵 **Normal = 60 u.a.** (Sesión óptima / ritmo estándar)\n'
+                          '• 🟠 **Intenso = 80 u.a.** (Alta exigencia física / competitiva)\n'
+                          '• 🔴 **Muy Intenso = 100 u.a.** (Fatiga extrema / máximo esfuerzo al límite)',
                     ),
                     const SizedBox(height: 16),
                     _buildGuideItem(
@@ -294,55 +295,91 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
         backgroundColor: AppTheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary, size: 24),
           tooltip: 'Volver a Votación de Jugadores',
           onPressed: widget.onExit,
         ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Icon(Icons.shield, color: AppTheme.primary, size: 18),
-                SizedBox(width: 6),
-                Text(
-                  'PANEL SÚPER USUARIO',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.3,
+            // LOGO 1: TeamLoad Pro
+            Container(
+              height: 34,
+              width: 34,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  'assets/images/app_logo_transparent.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (c, e, s) => Image.asset(
+                    'assets/images/app_logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (c2, e2, s2) => const Icon(Icons.bolt, color: AppTheme.primary, size: 18),
                   ),
                 ),
-              ],
+              ),
             ),
-            Text(
-              'Estadísticas, Ratios ACWR & Gestión',
-              style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+            const SizedBox(width: 6),
+            // LOGO 2: MC Emprender
+            Container(
+              height: 34,
+              width: 34,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.secondary.withValues(alpha: 0.4)),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  'assets/images/logo_mc.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (ctx, err, st) => const Icon(Icons.shield, color: AppTheme.secondary, size: 18),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'TeamLoad Pro',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.3,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    'PANEL DT • MC EMPRENDER ⚽',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 10, color: AppTheme.secondary, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline_rounded, color: AppTheme.primary),
-            tooltip: '¿Cómo leer estas métricas?',
+            icon: const Icon(Icons.help_outline_rounded, color: AppTheme.primary, size: 24),
+            tooltip: 'Guía de Métricas Deportivas',
             onPressed: () => _showGuideModal(context),
           ),
-          FilledButton.tonalIcon(
-            onPressed: widget.onExit,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primary.withValues(alpha: 0.12),
-              foregroundColor: AppTheme.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            ),
-            icon: const Icon(Icons.sports_soccer, size: 16),
-            label: const Text(
-              'Ir a Votar',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 2),
           IconButton(
-            icon: const Icon(Icons.lock_outline, color: AppTheme.textSecondary),
+            icon: const Icon(Icons.lock_outline_rounded, color: AppTheme.textSecondary, size: 22),
             tooltip: 'Bloquear / Cerrar Sesión Súper Usuario',
             onPressed: () {
               context.read<SettingsProvider>().logoutSuperUser();
@@ -452,7 +489,7 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
                           const SizedBox(height: 12),
                           _buildMiniGuideRow(
                             'u.a.',
-                            'Unidades Arbitrarias: Escala de cansancio (Ligero=25, Normal=50, Fuerte=75, Muy Fuerte=100).',
+                            'Unidades Arbitrarias: Escala de cansancio (Muy Ligero=20, Ligero=40, Normal=60, Intenso=80, Muy Intenso=100).',
                           ),
                           const SizedBox(height: 8),
                           _buildMiniGuideRow(
@@ -537,37 +574,70 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
             ),
             const SizedBox(height: 14),
 
-            // 4 TARJETAS DE MÉTRICAS CLAVE
-            Row(
-              children: [
-                MetricCard(
+            // 4 TARJETAS DE MÉTRICAS RESPONSIVAS (2x2 en móviles, 1x4 en Desktop)
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final card1 = MetricCard(
                   title: 'Votaciones',
                   value: totalVotes.toString(),
                   subtitle: _getPeriodSubtitle(trainingProvider.selectedDateFilter),
                   statusColor: AppTheme.primary,
-                ),
-                const SizedBox(width: 8),
-                MetricCard(
+                );
+                final card2 = MetricCard(
                   title: 'Carga Aguda (7d)',
                   value: '${acuteLoad.toStringAsFixed(0)} u.a.',
                   subtitle: 'Fatiga reciente',
                   statusColor: AppTheme.intensityFuerte,
-                ),
-                const SizedBox(width: 8),
-                MetricCard(
+                );
+                final card3 = MetricCard(
                   title: 'Carga Crónica (28d)',
                   value: '${chronicLoad.toStringAsFixed(0)} u.a.',
                   subtitle: 'Base física',
                   statusColor: AppTheme.primary,
-                ),
-                const SizedBox(width: 8),
-                MetricCard(
+                );
+                final card4 = MetricCard(
                   title: 'Ratio ACWR',
                   value: acwr.toStringAsFixed(2),
                   subtitle: acwrStatus,
                   statusColor: acwrColor,
-                ),
-              ],
+                );
+
+                if (constraints.maxWidth < 600) {
+                  // Cuadrícula 2x2 para móviles
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(child: card1),
+                          const SizedBox(width: 8),
+                          Expanded(child: card2),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(child: card3),
+                          const SizedBox(width: 8),
+                          Expanded(child: card4),
+                        ],
+                      ),
+                    ],
+                  );
+                } else {
+                  // 1 fila de 4 para tablets y escritorios
+                  return Row(
+                    children: [
+                      Expanded(child: card1),
+                      const SizedBox(width: 8),
+                      Expanded(child: card2),
+                      const SizedBox(width: 8),
+                      Expanded(child: card3),
+                      const SizedBox(width: 8),
+                      Expanded(child: card4),
+                    ],
+                  );
+                }
+              },
             ),
             const SizedBox(height: 16),
 
@@ -746,13 +816,22 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _buildDistributionItem('Ligero (25)', distribution['Ligero'] ?? 0, totalVotes, AppTheme.intensityLigero),
-                      _buildDistributionItem('Normal (50)', distribution['Normal'] ?? 0, totalVotes, AppTheme.intensityNormal),
-                      _buildDistributionItem('Fuerte (75)', distribution['Fuerte'] ?? 0, totalVotes, AppTheme.intensityFuerte),
-                      _buildDistributionItem('Muy fuerte (100)', distribution['Muy fuerte'] ?? 0, totalVotes, AppTheme.intensityMuyFuerte),
-                    ],
+                  Builder(
+                    builder: (context) {
+                      final activeIntensities = settingsProvider.intensities.isNotEmpty
+                          ? settingsProvider.intensities
+                          : ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'];
+                      return Row(
+                        children: activeIntensities.asMap().entries.map((entry) {
+                          final idx = entry.key;
+                          final name = entry.value;
+                          final score = AppTheme.getIntensityScore(name, idx, activeIntensities.length);
+                          final color = AppTheme.getIntensityColor(name, idx, activeIntensities.length);
+                          final count = distribution[name] ?? 0;
+                          return _buildDistributionItem('$name ($score)', count, totalVotes, color);
+                        }).toList(),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -1074,6 +1153,38 @@ class _SuperUserScreenState extends State<SuperUserScreen> with SingleTickerProv
                 },
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (dCtx) => AlertDialog(
+                    title: const Text('¿Restablecer Intensidades?'),
+                    content: const Text('Se configurarán los 5 niveles oficiales:\n• Muy Ligero (20 u.a.)\n• Ligero (40 u.a.)\n• Normal (60 u.a.)\n• Intenso (80 u.a.)\n• Muy Intenso (100 u.a.)'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.of(dCtx).pop(false), child: const Text('Cancelar')),
+                      FilledButton(onPressed: () => Navigator.of(dCtx).pop(true), child: const Text('Restablecer')),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  await settingsProvider.restoreDefaultIntensities();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Intensidades restablecidas a los 5 niveles oficiales')),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.restore, size: 16),
+              label: const Text(
+                'Restablecer a los 5 niveles oficiales (Muy Ligero, Ligero, Normal, Intenso, Muy Intenso)',
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
           ),
           const Divider(height: 36),
 

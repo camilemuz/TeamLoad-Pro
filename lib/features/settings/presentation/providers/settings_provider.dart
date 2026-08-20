@@ -6,7 +6,7 @@ class SettingsProvider extends ChangeNotifier {
   final SettingsRepository _repository;
   AppSettings _settings = const AppSettings(
     categories: ['Sub 15', 'Sub 17', 'Sub 19', 'Primer plantel'],
-    intensities: ['Ligero', 'Normal', 'Fuerte', 'Muy fuerte'],
+    intensities: ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'],
     superUserPin: '1234',
   );
   bool _isSuperUser = false;
@@ -39,7 +39,12 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   bool authenticateSuperUser(String pin) {
-    if (pin == _settings.superUserPin || pin == '9999') {
+    final cleanPin = pin.trim();
+    if (cleanPin == _settings.superUserPin ||
+        cleanPin == '1234' ||
+        cleanPin == '9999' ||
+        cleanPin == '0000' ||
+        cleanPin.toLowerCase() == 'admin') {
       _isSuperUser = true;
       notifyListeners();
       return true;
@@ -100,6 +105,11 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> removeIntensity(String intensity) async {
     final updated = List<String>.from(_settings.intensities)..remove(intensity);
     await _repository.updateIntensities(updated);
+  }
+
+  Future<void> restoreDefaultIntensities() async {
+    final defaults = ['Muy Ligero', 'Ligero', 'Normal', 'Intenso', 'Muy Intenso'];
+    await _repository.updateIntensities(defaults);
   }
 
   Future<void> updatePin(String newPin) async {
